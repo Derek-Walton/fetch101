@@ -14,30 +14,26 @@ async function showMessage(elem, url) {
 
 async function showList(elem, url) {
   const response = await fetch(url);
+  let listItems = 'not good';
   if (response.ok) {
-    const data = await response.json();
-    for (const li of data) {
-      const newLi = document.createElement('li');
-      newLi.textContent = li;
-      elem.appendChild(newLi);
-    }
+    listItems = await response.json();
   } else {
-    console.log('Response was not OK');
+    console.log('error');
+  }
+
+  for (let index = 0; index < listItems.length; index++) {
+    const newElement = document.createElement('li');
+    newElement.textContent = listItems[index];
+    elem.appendChild(newElement);
   }
 }
 
 function startShowingMessage(elem, url) {
-  setInterval(fetchText, 1000, elem, url);
-}
-
-async function fetchText(elem, url) {
-  const response = await fetch(url);
-  if (response.ok) {
+  setInterval(async callback => {
+    const response = await fetch(url);
     const text = await response.text();
     elem.textContent = text;
-  } else {
-    console.log('NOT OK!!!');
-  }
+  }, 1000);
 }
 
 async function handleError(elem, url) {
@@ -51,15 +47,11 @@ async function handleError(elem, url) {
 }
 
 function drawBox(canvas, url) {
-  setInterval(fetchBoxCoord, 1000, canvas, url);
-}
-
-async function fetchBoxCoord(canvas, url) {
-  const response = await fetch(url);
-  const coordinates = await response.json();
-  const xCoord = coordinates.x;
-  const yCoord = coordinates.y;
-
-  const contex = canvas.getContext('2d');
-  contex.fillRect(xCoord, yCoord, 10, 10);
+  setInterval(async event => {
+    const response = await fetch(url);
+    const coordinates = await response.json();
+    const ctx = canvas.getContext('2d');
+    ctx.fillRect(coordinates.x, coordinates.y, 10, 10);
+    console.log(coordinates);
+  }, 1000);
 }
